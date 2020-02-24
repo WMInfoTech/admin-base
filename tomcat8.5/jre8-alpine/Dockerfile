@@ -13,7 +13,8 @@ ENV XMS=2g XMX=4g BANNERDB_JDBC=jdbc:oracle:thin:@//oracle.example.edu:1521/prod
   REMOVE_ABANDONED_TIMEOUT=2100 \
   LOG_ABANDONED=true \
   DEFAULT_ROW_PREFETCH=150 \
-  JMX_EXPORTER_CONFIG=/usr/local/tomcat/conf/tomcat_jmx_exporter.yaml
+  JMX_EXPORTER_CONFIG=/usr/local/tomcat/conf/tomcat_jmx_exporter.yaml \
+  BANNER_APP=BannerAdmin
 
 ENV CATALINA_OPTS="-server -Xms\$XMS -Xmx\$XMX -Duser.timezone=\$TIMEZONE -Doracle.jdbc.autoCommitSpecCompliant=false"
 

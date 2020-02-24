@@ -17,19 +17,19 @@ setProperty() {
 
   #Enable Theme for BannerAdmin
   if [ "$prop" = "theme.url" ]; then
-    sed -i "98i <param name=\"APP_CSS_URL\" value=\"$val\" />\\n<param name=\"APP_CSS_APPEND\" value=\"true\" />" /usr/local/tomcat/webapps/BannerAdmin/config.xml
+    sed -i "98i <param name=\"APP_CSS_URL\" value=\"$val\" />\\n<param name=\"APP_CSS_APPEND\" value=\"true\" />" /usr/local/tomcat/webapps/${BANNER_APP}/config.xml
   fi
 
   #Set CAS server for BannerAdmin.ws
   if [ "$prop" = "cas.url" ]; then
-    sed -i "s|^cas\.server\.location.*|cas\.server\.location = $val|g" /usr/local/tomcat/webapps/BannerAdmin.ws/WEB-INF/classes/config.properties
+    sed -i "s|^cas\.server\.location.*|cas\.server\.location = $val|g" /usr/local/tomcat/webapps/${BANNER_APP}.ws/WEB-INF/classes/config.properties
   fi
 
   #Set Banner9.baseurl for BannerAdmin.ws
   if [ "$prop" = "banner9.baseurl" ]; then
-    sed -i "s|^webapp\.location.*|webapp\.location = $val\/\${webapp.context}|g" /usr/local/tomcat/webapps/BannerAdmin.ws/WEB-INF/classes/config.properties
-    sed -i "s|<param name=\"APPNAV_HELP_URL\".*|<param name=\"APPNAV_HELP_URL\" value=\"$val\/bannerHelp\/Main?page=\" \/>|g" /usr/local/tomcat/webapps/BannerAdmin/config.xml
-    sed -i "s|<param name=\"APPNAV_API_URL\".*|<param name=\"APPNAV_API_URL\" value=\"$val\/applicationNavigator\/static\/dist\/m\.js\" \/>|g" /usr/local/tomcat/webapps/BannerAdmin/config.xml
+    sed -i "s|^webapp\.location.*|webapp\.location = $val\/\${webapp.context}|g" /usr/local/tomcat/webapps/${BANNER_APP}.ws/WEB-INF/classes/config.properties
+    sed -i "s|<param name=\"APPNAV_HELP_URL\".*|<param name=\"APPNAV_HELP_URL\" value=\"$val\/bannerHelp\/Main?page=\" \/>|g" /usr/local/tomcat/webapps/${BANNER_APP}/config.xml
+    sed -i "s|<param name=\"APPNAV_API_URL\".*|<param name=\"APPNAV_API_URL\" value=\"$val\/applicationNavigator\/static\/dist\/m\.js\" \/>|g" /usr/local/tomcat/webapps/${BANNER_APP}/config.xml
   fi
 
 
