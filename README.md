@@ -1,55 +1,33 @@
 # Bandock Banner 9 Admin Base
-Banner 9 Admin Base is a base image to build the Banner Admin application on. Variables can be added from ENV variables, config file or docker secrets.
+Banner 9 Admin Base is a base image to build the Banner Admin applications on top of.
 
-## Tags
+The intent is that images built on this base will be portable across production, test, and
+development instance of your install. We attempt to set everything required by Tomcat, and
+the settings that are contained in your war file, typically those found in xml files.
 
-https://hub.docker.com/r/edurepo/banner9-admin/
-
-Tomcat8
-
-- tomcat8-jre8-alpine
-- tomcat8-oraclejava8-oracelinux7
-
-Tomcat 8.5
-
-- tomcat8.5-jre8-alpine
-- tomcat8.5-oraclejava8-oraclelinux7
+Runtime configuation is managed by the settings in the run.sh file. The resulting
+image should work on Docker Swarm, Kubernetes, and other popular container orchestrators.
 
 ## How to use
 
-This base image is designed to have Banner 9 admin applications built on it. It is built for those applciations that require banproxy and not ban_ss_user.  Multiple builds are available.  At a minimum both builds of alpine and oracle linux will be available.  Alpine for its small size and oracle linux for Banner support compliance.
+Copy extracted war files to `/usr/local/tomcat/webapps/`, where application.war becomes
+`webapps/application`. 
 
-Properties can be loaded from multiple sources: environment variables, docker secrets, config file or combination of sources. They are appended to catalina.properties before tomcat starts. For tomcat to function the following properties need to be set: bannerdb.jdbc, banproxy.username, banproxy.username, banproxy.initialsize, banproxy.maxtotal, banproxy.maxidle, banproxy.maxwait, cas.url, banner9.url and theme.url. If they are not configued default values will be set from environment variables from the Dockerfile.
-
-Uncompress the three banner admin wars into the same directory as the Dockerfile, as folders called BannerAdmin, BannerAdmin.ws and bannerHelp.
-
-#### DockerFile
-
+A Dockerfile might look like
 ```Dockerfile
-FROM edurepo/banner9-admin:tomcat8-jre8-alpine
+FROM admin-base
 
-COPY --chown=tomcat:tomcat BannerAdmin /usr/local/tomcat/webapps/BannerAdmin
-COPY --chown=tomcat:tomcat BannerAdmin.ws /usr/local/tomcat/webapps/BannerAdmin.ws
-COPY --chown=tomcat:tomcat bannerHelp /usr/local/tomcat/webapps/bannerHelp
+COPY --chown=tomcat:tomcat application /usr/local/tomcat/webapps/application/
+COPY --chown=tomcat:tomcat application.ws /usr/local/tomcat/webapps/application.ws/
+COPY --chown=tomcat:tomcat applicationHelp /usr/local/tomcat/webapps/applicationHelp/
 ```
 
-#### Build
+Properties used by Tomcat can be loaded from environment variables or files
+(typically provided by your orchestrator as configs or secrets). The settings
+required by Tomcat for JNDI connections are appended to catalina.properties before Tomcat starts.
 
-```Shell
-docker build -t registry.myschool.edu/banner/banneradmin:9.3.10.0.3
-```
+If you don't set something, the default values from the Dockerfile are used.
 
-#### Run with environment variables
-
-```Shell
-docker run -e "BANNERDB_JDBC=jdbc:oracle:thin:@//oracle.example.edu:1521/prod" -e "BANPROXY_PASSWORD=password" -e "CAS_URL=https://cas.local.com/cas" -e "BANNER9_URL=https://banner9.school.edu" -e "THEME_URL=https://banner9.school.edu/BannerExtensibility/theme/getTheme?name=dev&amp;template=admin" -e "TIMEZONE=America/Denver" -p 8080:8080 registry.myschool.edu/banner/banneradmin:9.3.10.0.3
-```
-
-#### Run with config file
-
-```Shell
-docker run -e "CONFIG_FILE=/opt/config/banner.properties" -e "TIMEZONE=America/Denver" -p 8080:8080 registry.myschool.edu/banner/banneradmin:9.3.10.0.3
-```
 
 ## Properties from Environment Variables
 
@@ -57,7 +35,8 @@ Environment variables are used to setup the base parameters for tomcat to connec
 
 ### Defaults
 
-If an environment variable is not specificed at runtime then the defaults for the variable will be used. At a minimum BANNERDB_JDBC, BANPROXY_PASSWORD, CAS_URL, and BANNER9_URL need to be set. It is highly recommended setting the TIMEZONE to the timezone of your Banner database.
+If an environment variable is not specificed at runtime then the defaults for the variable will be used. At a minimum BANNERDB_JDBC, BANPROXY_PASSWORD, CAS_URL, and BANNER9_URL need to be set
+for your application to be useful. It is highly recommended setting the TIMEZONE to the timezone of your Banner database too.
 
 ### Environment Variables
 
@@ -86,7 +65,8 @@ THEME_URL - example: https://banner9.school.edu/BannerExtensibility/theme/getThe
 
 ## Properties from Config file
 
-When loading from a config file, defaults are ignored and all parameters will need to be set in the file.
+When loading from a config file, set the environment variable `CONFIG_FILE` to the location
+of the configuration file, from there all other environment variables will be ignored by run.sh.
 
 ```Shell
 bannerdb.jdbc=jdbc:oracle:thin:@//oracle.example.edu:1521/prod
