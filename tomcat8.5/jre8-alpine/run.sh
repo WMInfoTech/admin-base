@@ -92,6 +92,12 @@ setPropFromEnv() {
   fi
 }
 
+setAdminProperties() {
+  sed -i "s|^connection\.host.*|connection\.host = $DBHOST|g" /usr/local/tomcat/webapps/${BANNER_APP}.ws/WEB-INF/classes/config.properties
+  sed -i "s|^connection\.database.*|connection\.database = $BANNERDB|g" /usr/local/tomcat/webapps/${BANNER_APP}.ws/WEB-INF/classes/config.properties
+  echo "webapp.base.url=$BANNER9_URL" >> /usr/local/tomcat/webapps/${BANNER_APP}.ws/WEB-INF/classes/config.properties
+}
+
 if [ -z "$CONFIG_FILE" ]; then
   setPropFromEnv bannerdb.jdbc "$BANNERDB_JDBC"
   setPropFromEnv banproxy.username "$BANPROXY_USERNAME"
@@ -117,5 +123,7 @@ fi
 if [ -n "$PROMETHEUS_JMX_PORT" ]; then
   export CATALINA_OPTS="$CATALINA_OPTS -javaagent:/usr/local/tomcat/lib/jmx_exporter.jar=$PROMETHEUS_JMX_PORT:$JMX_EXPORTER_CONFIG"
 fi
+
+setAdminProperties
 
 exec catalina.sh run
